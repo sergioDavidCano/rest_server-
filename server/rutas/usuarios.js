@@ -3,8 +3,9 @@ const bcrypt = require('bcrypt');
 const _ = require('underscore');
 const Usuario = require('../modelos/usuario');
 const usuario = require('../modelos/usuario');
+const { vereficacionToken, vereficacionADMIN_ROLE } = require('../middlewares/autenticacion')
 const app = express();
-app.get('/usuario', function(req, res) {
+app.get('/usuario', vereficacionToken, (req, res) => {
     let id = req.params.id;
     let desde = req.query.desde || 0;
     desde = Number(desde);
@@ -17,7 +18,9 @@ app.get('/usuario', function(req, res) {
             if (err) {
                 return res.status(400).json({
                     ok: false,
-                    err
+                    err: {
+                        message: 'Token no valido'
+                    }
                 })
             } else {
                 usuario.count({ estado: true }, (err, conteo) => {
@@ -31,7 +34,7 @@ app.get('/usuario', function(req, res) {
         })
 });
 //Post crear nuevos registros en el servidor 
-app.post('/usuario', function(req, res) {
+app.post('/usuario', [vereficacionToken, vereficacionADMIN_ROLE], (req, res) => {
     let body = req.body;
     let usuario = new Usuario({
         nombre: body.nombre,
@@ -44,7 +47,9 @@ app.post('/usuario', function(req, res) {
         if (err) {
             return res.status(400).json({
                 ok: false,
-                err
+                err: {
+                    message: 'token no valido'
+                }
             })
         } else {
             //usuarioDB.password = null;
@@ -56,14 +61,16 @@ app.post('/usuario', function(req, res) {
     })
 });
 //put/patch se utiliza para actualizar registros
-app.put('/usuario/:id', function(req, res) {
+app.put('/usuario/:id', [vereficacionToken, vereficacionADMIN_ROLE], (req, res) => {
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre', 'gmail', 'img', 'role', 'estado']);
     usuario.findByIdAndUpdate(id, body, { new: true, runValidators: true }, (err, usuarioDB) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
-                err
+                err: {
+                    message: 'token no valido'
+                }
             });
         }
         res.json({
@@ -74,7 +81,7 @@ app.put('/usuario/:id', function(req, res) {
     })
 });
 //delete es para cambiar el estado de algo 
-app.delete('/usuario/:id', function(req, res) {
+app.delete('/usuario/:id', [vereficacionToken, vereficacionADMIN_ROLE], (req, res) => {
     let id = req.params.id;
     let cambiaEstado = {
         estado: false
