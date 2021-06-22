@@ -1,7 +1,8 @@
 //verificacion de un token
 const jwt = require('jsonwebtoken');
 let vereficacionToken = (req, res, next) => {
-    let token = req.get('token'); // Autorizacion de un token
+    //Vereficacion de un token para acceder a cualquier funcion del backend
+    let token = req.get('token');
     jwt.verify(token, process.env.SEMILLADETOKEN, (err, decoded) => {
         if (err) {
             return res.status(401).json({
