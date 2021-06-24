@@ -9,11 +9,13 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
-app.use(express.static(path.resolve(__dirname, '../public')))
 app.use(require('./rutas/usuarios'));
 app.use(require('./rutas/login'));
 app.use(require('./rutas/categorias'));
-app.use(require('./rutas/productos'))
+app.use(require('./rutas/productos'));
+app.use(require('./rutas/upload'));
+app.use(require('./rutas/imagenes'))
+app.use(express.static(path.resolve(__dirname, '../public')))
 mongoose.connect('mongodb://localhost:27017/cafe', { useNewUrlParser: true, useCreateIndex: true },
     (err, resp) => {
         if (err) throw new err;
